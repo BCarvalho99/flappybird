@@ -38,3 +38,38 @@ function BarrierPair(height, voidspace, x) {
   this.randomSpace();
   this.setX(x);
 }
+
+function Barriers(height, width, mid, barrierspace, pointCount) {
+  this.pairs = [
+    new BarrierPair(height, mid, width),
+    new BarrierPair(height, mid, width + barrierspace),
+    new BarrierPair(height, mid, width + barrierspace * 2),
+    new BarrierPair(height, mid, width + barrierspace * 3),
+  ];
+
+  const movement = 2;
+  this.animation = () => {
+    this.pairs.forEach((pair) => {
+      pair.setX(pair.getX() - movement);
+
+      if (pair.getX() < -pair.getWidth()) {
+        pair.setX(pair.getX() + barrierspace * this.pairs.length);
+        pair.randomSpace();
+      }
+
+      const checkMid = width / 2;
+      const hasCrossedMid =
+        pair.getX() + movement >= checkMid && pair.getX() < mid;
+      if (hasCrossedMid) pointCount();
+    });
+  };
+}
+
+const barriers = new Barriers(700, 1200, 200, 400);
+const area = document.querySelector("[js-flappy]");
+barriers.pairs.forEach((pair) => {
+  area.appendChild(pair.element);
+});
+setInterval(() => {
+  barriers.animation();
+}, 20);
