@@ -65,11 +65,41 @@ function Barriers(height, width, mid, barrierspace, pointCount) {
   };
 }
 
+function Bird(verticalPosition) {
+  let flying = false;
+  this.element = newElement("img", "bird");
+  this.element.src = "imgs/bird.png";
+
+  this.getY = () => parseInt(this.element.style.bottom.split("px")[0]);
+  this.setY = (y) => (this.element.style.bottom = `${y}px`);
+
+  window.onkeydown = (e) => (flying = true);
+  window.onkeyup = (e) => (flying = false);
+
+  this.animation = () => {
+    const newY = this.getY() + (flying ? 8 : -5);
+    const maxHeight = verticalPosition - this.element.clientHeight;
+
+    if (newY <= 0) {
+      this.setY(0);
+    } else if (newY >= maxHeight) {
+      this.setY(maxHeight);
+    } else {
+      this.setY(newY);
+    }
+  };
+  this.setY(verticalPosition / 2);
+}
+
 const barriers = new Barriers(700, 1200, 200, 400);
+const bird = new Bird(700);
 const area = document.querySelector("[js-flappy]");
+area.appendChild(bird.element);
 barriers.pairs.forEach((pair) => {
   area.appendChild(pair.element);
 });
+
 setInterval(() => {
   barriers.animation();
+  bird.animation();
 }, 20);
