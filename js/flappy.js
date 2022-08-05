@@ -59,7 +59,7 @@ function Barriers(height, width, mid, barrierspace, pointCount) {
 
       const checkMid = width / 2;
       const hasCrossedMid =
-        pair.getX() + movement >= checkMid && pair.getX() < mid;
+        pair.getX() + movement >= checkMid && pair.getX() < checkMid;
       if (hasCrossedMid) pointCount();
     });
   };
@@ -91,15 +91,37 @@ function Bird(verticalPosition) {
   this.setY(verticalPosition / 2);
 }
 
-const barriers = new Barriers(700, 1200, 200, 400);
-const bird = new Bird(700);
-const area = document.querySelector("[js-flappy]");
-area.appendChild(bird.element);
-barriers.pairs.forEach((pair) => {
-  area.appendChild(pair.element);
-});
+function Progress() {
+  this.element = newElement("span", "progress");
+  this.pointUpdate = (points) => {
+    this.element.innerHTML = points;
+  };
+  this.pointUpdate(0);
+}
 
-setInterval(() => {
-  barriers.animation();
-  bird.animation();
-}, 20);
+function FPgame() {
+  let points = 0;
+
+  const area = document.querySelector("[js-flappy]");
+  const height = area.clientHeight;
+  const width = area.clientWidth;
+
+  const progress = new Progress();
+  const barriers = new Barriers(height, width, 200, 400, () =>
+    progress.pointUpdate(++points)
+  );
+  const bird = new Bird(height);
+
+  area.appendChild(progress.element);
+  area.appendChild(bird.element);
+  barriers.pairs.forEach((pair) => area.appendChild(pair.element));
+
+  this.start = () => {
+    const timer = setInterval(() => {
+      barriers.animation();
+      bird.animation();
+    }, 20);
+  };
+}
+
+new FPgame().start();

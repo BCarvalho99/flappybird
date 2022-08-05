@@ -54,6 +54,7 @@
 }
 
 .progress {
+  z-index: 100;
   font-family: Pixel;
   position: absolute;
   top: 10px;
