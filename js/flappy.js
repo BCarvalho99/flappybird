@@ -99,6 +99,29 @@ function Progress() {
   this.pointUpdate(0);
 }
 
+function checkPosition(aItem, bItem) {
+  const a = aItem.getBoundingClientRect();
+  const b = bItem.getBoundingClientRect();
+
+  const horizonPos = a.left + a.width >= b.left && b.left + b.width >= a.left;
+  const verticalPos = a.top + a.height >= b.top && b.top + b.height >= a.top;
+  return horizonPos && verticalPos;
+}
+
+function Collided(bird, barriers) {
+  let collided = false;
+  barriers.pairs.forEach((BarrierPair) => {
+    if (!collided) {
+      const above = BarrierPair.upper.element;
+      const bellow = BarrierPair.bottom.element;
+      collided =
+        checkPosition(bird.element, above) ||
+        checkPosition(bird.element, bellow);
+    }
+  });
+  return collided;
+}
+
 function FPgame() {
   let points = 0;
 
@@ -120,6 +143,10 @@ function FPgame() {
     const timer = setInterval(() => {
       barriers.animation();
       bird.animation();
+
+      if (Collided(bird, barriers)) {
+        clearInterval(timer);
+      }
     }, 20);
   };
 }
